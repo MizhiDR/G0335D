@@ -19,6 +19,7 @@ from __future__ import print_function
 
 NFC = "vendor/nxp-nfc/opensource/Nfc/nci/jni/NativeSecureElement.cpp"
 ROUTING = "vendor/nxp-nfc/opensource/Nfc/nci/jni/RoutingManager.cpp"
+NATIVE_MGR = "vendor/nxp-nfc/opensource/Nfc/nci/jni/NativeNfcManager.cpp"
 
 
 def patch(path, old, new):
@@ -48,4 +49,28 @@ patch(
     "    SecureElement& se = SecureElement::getInstance();",
     "#if (NFC_NXP_ESE == TRUE)\n"
     "    SecureElement& se = SecureElement::getInstance();",
+)
+
+# SecureElement::checkForWiredModeAccess() is compiled unconditionally and
+# calls android::isp2pActivated(), but that helper is only built for chips
+# other than PN547C2.  The state variable exists for every chip, so build the
+# accessor as well.
+patch(
+    NATIVE_MGR,
+    "#if(NFC_NXP_ESE == TRUE && (NFC_NXP_CHIP_TYPE != PN547C2))\n"
+    "bool isp2pActivated();",
+    "#if(NFC_NXP_ESE == TRUE)\n"
+    "bool isp2pActivated();",
+)
+
+patch(
+    NATIVE_MGR,
+    "#if(NFC_NXP_ESE == TRUE && (NFC_NXP_CHIP_TYPE != PN547C2))\n"
+    "/*******************************************************************************\n"
+    "**\n"
+    "** Function:        isp2pActivated",
+    "#if(NFC_NXP_ESE == TRUE)\n"
+    "/*******************************************************************************\n"
+    "**\n"
+    "** Function:        isp2pActivated",
 )
