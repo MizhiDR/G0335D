@@ -111,6 +111,9 @@ jobs:
           cd "$GITHUB_WORKSPACE/lineage"
           source build/envsetup.sh
           lunch lineage_g0335d-userdebug
+          # Work around an old kati/find issue: some CM14.1 makefiles run
+          # "find" on this intermediates dir before it is created.
+          mkdir -p out/target/common/obj/SHARED_LIBRARIES/libwifi-hal-mock_intermediates
           export WITH_DEXPREOPT=false
           export LC_ALL=C
           mka bacon -j4
