@@ -62,7 +62,9 @@ jobs:
 
       - name: Repo init and sync
         run: |
-          mkdir -p /mnt/lineage
+          sudo mkdir -p /mnt/lineage
+          sudo chown -R "$USER":"$USER" /mnt/lineage
+          df -h / /mnt
           cd /mnt/lineage
           repo init -u https://github.com/LineageOS/android.git -b cm-14.1 --depth=1
           repo sync -c -j8 --force-sync --no-clone-bundle --no-tags
