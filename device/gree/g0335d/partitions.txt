@@ -1,0 +1,15 @@
+GREE G3S / G0335D partition layout (measured from the connected phone)
+
+boot      /dev/block/sde17   65536 blocks   = 67,108,864 B   (64 MiB)
+recovery  /dev/block/sde19   97280 blocks   = 99,614,720 B   (95 MiB)
+system    /dev/block/sde18   3145728 blocks = 3,221,225,472 B (3 GiB)
+userdata  /dev/block/sda9    57824972 blocks= 59,212,771,328 B
+cache     /dev/block/sda3    262144 blocks  = 268,435,456 B  (256 MiB)
+persist   /dev/block/sda2    32768 blocks   = 33,554,432 B   (32 MiB)
+modem     /dev/block/sde11   97280 blocks   = 99,614,720 B   (95 MiB)
+
+Notes:
+- Older G0215D/G0335D dumps list recovery as 64 MiB. On this G0335D unit the
+  recovery partition is 95 MiB (99,614,720 B); BoardConfig.mk uses that value.
+- by-name symlinks are under /dev/block/bootdevice/by-name/.
+- This file is documentation only; it is not used by the build.

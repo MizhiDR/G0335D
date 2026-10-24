@@ -1,0 +1,14 @@
+# Build output
+out/
+*.zip
+*.img
+*.log
+__pycache__/
+*.pyc
+
+# Generated vendor blobs (add them explicitly if you want to publish them)
+vendor/gree/g0335d/proprietary/
+vendor/gree/g0335d/Android.mk
+vendor/gree/g0335d/BoardConfigVendor.mk
+vendor/gree/g0335d/g0335d-vendor.mk
+vendor/cm/

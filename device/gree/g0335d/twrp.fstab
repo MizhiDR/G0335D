@@ -1,0 +1,22 @@
+# TWRP fstab for GREE G0335D (G3S)
+# mount point	fstype	device	[device2]	flags
+
+/boot		emmc	/dev/block/bootdevice/by-name/boot		flags=display="Boot";backup=1
+/recovery	emmc	/dev/block/bootdevice/by-name/recovery		flags=display="Recovery";backup=1
+/system		ext4	/dev/block/bootdevice/by-name/system		flags=display="System";backup=1;wipeingui
+/system_image	emmc	/dev/block/bootdevice/by-name/system		flags=display="System Image";backup=1
+/data		ext4	/dev/block/bootdevice/by-name/userdata		flags=display="Data";encryptable=footer;length=-16384;backup=1;wipeingui
+/cache		ext4	/dev/block/bootdevice/by-name/cache		flags=display="Cache";wipeingui
+/persist	ext4	/dev/block/bootdevice/by-name/persist		flags=display="Persist";backup=1
+/firmware	vfat	/dev/block/bootdevice/by-name/modem		flags=display="Firmware";mounttodecrypt;fsflags=ro;backup=1
+/bluetooth	vfat	/dev/block/bootdevice/by-name/bluetooth		flags=display="Bluetooth";fsflags=ro
+/dsp		ext4	/dev/block/bootdevice/by-name/dsp		flags=display="DSP";fsflags=ro
+/misc		emmc	/dev/block/bootdevice/by-name/misc
+
+/efs1		emmc	/dev/block/bootdevice/by-name/modemst1		flags=display="EFS";backup=1
+/efs2		emmc	/dev/block/bootdevice/by-name/modemst2		flags=backup=1;subpartitionof=/efs1
+/efsc		emmc	/dev/block/bootdevice/by-name/fsc		flags=backup=1;subpartitionof=/efs1
+/efsg		emmc	/dev/block/bootdevice/by-name/fsg		flags=backup=1;subpartitionof=/efs1
+
+# Removable storage
+/usb_otg	vfat	/dev/block/sdg1	/dev/block/sdg	flags=display="USB OTG";storage;wipeingui;removable

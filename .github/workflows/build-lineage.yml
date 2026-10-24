@@ -1,0 +1,119 @@
+name: Build LineageOS 14.1 (G0335D)
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: LineageOS 14.1 / g0335d
+    runs-on: ubuntu-22.04
+    timeout-minutes: 360
+
+    steps:
+      - name: Checkout device tree
+        uses: actions/checkout@v4
+
+      - name: Free disk space
+        uses: easimon/maximize-build-space@master
+        with:
+          root-reserve-mb: 4096
+          temp-reserve-mb: 2048
+          swap-size-mb: 2048
+          remove-dotnet: true
+          remove-android: true
+          remove-haskell: true
+          remove-codeql: true
+          remove-docker-images: true
+
+      - name: Set up Java 8
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '8'
+
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            bc bison build-essential ccache curl flex g++-multilib gcc-multilib \
+            git gnupg gperf imagemagick lib32ncurses-dev lib32readline-dev \
+            lib32z1-dev libelf-dev liblz4-tool libncurses-dev libsdl1.2-dev \
+            libssl-dev libwxgtk3.0-gtk3-dev libxml2 libxml2-utils lzop \
+            pngcrush python2 rsync schedtool squashfs-tools xsltproc zip zlib1g-dev
+          sudo ln -sf /usr/bin/python2 /usr/bin/python || true
+
+      - name: Install repo
+        run: |
+          mkdir -p "$HOME/bin"
+          curl -s https://storage.googleapis.com/git-repo-downloads/repo > "$HOME/bin/repo"
+          chmod a+x "$HOME/bin/repo"
+          echo "$HOME/bin" >> "$GITHUB_PATH"
+
+      - name: Configure git
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+          git config --global color.ui false
+
+      - name: Repo init and sync
+        run: |
+          mkdir -p /mnt/lineage
+          cd /mnt/lineage
+          repo init -u https://github.com/LineageOS/android.git -b cm-14.1 --depth=1
+          repo sync -c -j8 --force-sync --no-clone-bundle --no-tags
+
+      - name: Install device tree and kernel
+        run: |
+          cd /mnt/lineage
+          mkdir -p device/gree kernel/gree
+          cp -r "$GITHUB_WORKSPACE/device/gree/g0335d" device/gree/
+          cp -r "$GITHUB_WORKSPACE/kernel/gree/msm8996" kernel/gree/
+          if [ -d "$GITHUB_WORKSPACE/vendor/gree/g0335d/proprietary" ]; then
+            mkdir -p vendor/gree
+            cp -r "$GITHUB_WORKSPACE/vendor/gree/g0335d" vendor/gree/
+          fi
+
+      - name: Build LineageOS 14.1
+        run: |
+          cd /mnt/lineage
+          source build/envsetup.sh
+          if ! breakfast g0335d; then
+            echo "breakfast failed, falling back to lunch lineage_g0335d-userdebug"
+            lunch lineage_g0335d-userdebug
+          fi
+          export WITH_DEXPREOPT=false
+          export LC_ALL=C
+          mka bacon -j4
+
+      - name: Collect artifacts
+        if: always()
+        run: |
+          mkdir -p "$GITHUB_WORKSPACE/artifacts"
+          PRODUCT_OUT="/mnt/lineage/out/target/product/g0335d"
+          cp "$PRODUCT_OUT"/*.zip "$GITHUB_WORKSPACE/artifacts/" 2>/dev/null || true
+          cp "$PRODUCT_OUT"/*.img "$GITHUB_WORKSPACE/artifacts/" 2>/dev/null || true
+          cp "$PRODUCT_OUT"/*.txt  "$GITHUB_WORKSPACE/artifacts/" 2>/dev/null || true
+          ls -lh "$GITHUB_WORKSPACE/artifacts" || true
+
+      - name: Upload artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lineage-14.1-g0335d
+          path: artifacts/
+          if-no-files-found: warn
+
+      - name: Upload build logs on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-logs
+          path: |
+            /mnt/lineage/out/verbose.log.gz
+            /mnt/lineage/out/error.log
+          if-no-files-found: ignore

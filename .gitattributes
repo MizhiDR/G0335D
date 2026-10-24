@@ -1,0 +1,11 @@
+* text=auto
+*.sh text eol=lf
+*.mk text eol=lf
+*.prop text eol=lf
+*.rc text eol=lf
+*.fstab text eol=lf
+*.img binary
+*.gz binary
+*.so binary
+*.apk binary
+*.jar binary
