@@ -59,21 +59,39 @@ What can be recovered reliably is:
 - the exact board DTS (`g0335d.dts`)
 - the symbol/driver set (via optional `vmlinux-to-elf` on a machine with PyPI access)
 
-Use the Xiaomi Mi 5 (gemini) msm8996 source as the baseline:
+Use the Xiaomi **Mi 5s (capricorn, MSM8996pro / Snapdragon 821)** source as the
+primary baseline:
 
 ```
 https://github.com/LineageOS/android_kernel_xiaomi_msm8996  (branch cm-14.1)
 ```
 
+The same repository also contains **Mi 5 (gemini, MSM8996 v3 / Snapdragon 820)**.
+Do **not** use gemini's 820 CPU OPP/regulator values for this phone; gemini is
+useful only for shared msm8996 drivers and display/touch infrastructure.
+
 Reference files extracted from that tree are in `reference/`:
 
-- `gemini_defconfig`
-- `gemini-msm8996pro-pmi8994-mtp.dts`
-- `gemini-msm8996-mtp.dtsi`
+- `capricorn_defconfig` — Mi 5s, 821
+- `capricorn-msm8996pro-pmi8996-mtp.dts` — Mi 5s 821 board DTS
+- `capricorn-msm8996-mtp.dtsi` — Mi 5s common DTS
+- `natrium_defconfig` — Mi 5s Plus, 821
+- `gemini_defconfig`, `gemini-msm8996pro-pmi8994-mtp.dts`,
+  `gemini-msm8996-mtp.dtsi` — Mi 5, 820 (shared code only)
 
-The Mi 5 tree already contains `drivers/input/touchscreen/synaptics_dsx/`
-(the G3S touch controller family) and the msm8996 clock/regulator/display
-infrastructure.
+The Mi 5s tree already contains `drivers/input/touchscreen/synaptics_dsx/`
+(the G3S touch controller family), the msm8996 clock/regulator/display
+infrastructure, and 821-specific CPU tables.
+
+Other 821 donor devices with public LineageOS 14.1 sources:
+
+- OnePlus 3T (`oneplus3`, 821) — unified 820/821 device tree and kernel
+- Xiaomi Mi 5s Plus (`natrium`, 821)
+- Xiaomi Mi Note 2 (`scorpio`, 821)
+- Xiaomi Mi Mix (`lithium`, 821)
+- LeEco Le Pro3 (`zl1`, 821)
+- Google Pixel / Pixel XL (`sailfish` / `marlin`, 821; A/B, less relevant)
+- LG G6 (`h870`, 821; LG-specific)
 
 ## Suggested kernel bring-up
 

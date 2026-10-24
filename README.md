@@ -48,6 +48,31 @@ G0335D/
 | 内核 | Linux 3.18.31-perf，`Image.gz` + 追加 DTB |
 | Treble | 不支持（无 vendor 分区，`/vendor -> /system/vendor`） |
 
+## 内核源码基线（821 vs 820）
+
+G3S 是 **msm8996pro / Snapdragon 821**（实机 `msm-id=0x1310001`），
+不是小米 5 的 msm8996 v3 / Snapdragon 820。
+
+首选源码基线：
+
+- **小米 5s（capricorn，821）**  
+  `LineageOS/android_kernel_xiaomi_msm8996`（cm-14.1）  
+  使用 `capricorn_defconfig`、`capricorn-msm8996pro-pmi8996-mtp.dts` 作为参考
+
+小米 5（gemini）是 820，只能参考其共享驱动/显示/触摸代码，**不能照搬
+820 的 CPU OPP/regulator 参数**；G3S 的 821 参数以实机 `g0335d.dts` 和
+`config_g0335d` 为准。
+
+其他可用 821 源码机型：
+
+- 一加 3T（oneplus3，820/821 统一树）
+- 小米 5s Plus（natrium）
+- 小米 Note 2（scorpio）
+- 小米 Mix（lithium）
+- 乐视乐 Pro3（zl1）
+- Google Pixel / Pixel XL（sailfish / marlin；A/B，参考价值较低）
+- LG G6（h870；LG 专用代码较多）
+
 ## 分区（UFS）
 
 | 分区 | 块设备 | 大小 |
