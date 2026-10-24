@@ -19,16 +19,15 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Free disk space
-        uses: easimon/maximize-build-space@master
+        uses: jlumbroso/free-disk-space@main
         with:
-          root-reserve-mb: 4096
-          temp-reserve-mb: 2048
-          swap-size-mb: 2048
-          remove-dotnet: true
-          remove-android: true
-          remove-haskell: true
-          remove-codeql: true
-          remove-docker-images: true
+          tool-cache: false
+          android: true
+          dotnet: true
+          haskell: true
+          large-packages: true
+          docker-images: true
+          swap-storage: true
 
       - name: Set up Java 8
         uses: actions/setup-java@v4
@@ -62,16 +61,15 @@ jobs:
 
       - name: Repo init and sync
         run: |
-          sudo mkdir -p /mnt/lineage
-          sudo chown -R "$USER":"$USER" /mnt/lineage
-          df -h / /mnt
-          cd /mnt/lineage
+          mkdir -p lineage
+          cd lineage
+          df -h /
           repo init -u https://github.com/LineageOS/android.git -b cm-14.1 --depth=1
           repo sync -c -j8 --force-sync --no-clone-bundle --no-tags
 
       - name: Install device tree and kernel
         run: |
-          cd /mnt/lineage
+          cd "$GITHUB_WORKSPACE/lineage"
           mkdir -p device/gree kernel/gree
           cp -r "$GITHUB_WORKSPACE/device/gree/g0335d" device/gree/
           cp -r "$GITHUB_WORKSPACE/kernel/gree/msm8996" kernel/gree/
@@ -82,7 +80,7 @@ jobs:
 
       - name: Build LineageOS 14.1
         run: |
-          cd /mnt/lineage
+          cd "$GITHUB_WORKSPACE/lineage"
           source build/envsetup.sh
           if ! breakfast g0335d; then
             echo "breakfast failed, falling back to lunch lineage_g0335d-userdebug"
@@ -96,7 +94,7 @@ jobs:
         if: always()
         run: |
           mkdir -p "$GITHUB_WORKSPACE/artifacts"
-          PRODUCT_OUT="/mnt/lineage/out/target/product/g0335d"
+          PRODUCT_OUT="$GITHUB_WORKSPACE/lineage/out/target/product/g0335d"
           cp "$PRODUCT_OUT"/*.zip "$GITHUB_WORKSPACE/artifacts/" 2>/dev/null || true
           cp "$PRODUCT_OUT"/*.img "$GITHUB_WORKSPACE/artifacts/" 2>/dev/null || true
           cp "$PRODUCT_OUT"/*.txt  "$GITHUB_WORKSPACE/artifacts/" 2>/dev/null || true
@@ -116,6 +114,6 @@ jobs:
         with:
           name: build-logs
           path: |
-            /mnt/lineage/out/verbose.log.gz
-            /mnt/lineage/out/error.log
+            lineage/out/verbose.log.gz
+            lineage/out/error.log
           if-no-files-found: ignore
