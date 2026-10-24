@@ -147,6 +147,11 @@ jobs:
           done
           export WITH_DEXPREOPT=false
           export LC_ALL=C
+          # cm-14.1's CMSDK makefile has a missing dependency: the
+          # org.cyanogenmod.platform.internal javac step runs before
+          # org.cyanogenmod.platform-res has generated R.java/Manifest.java.
+          # Build the resource package explicitly first.
+          mka org.cyanogenmod.platform-res -j4
           mka bacon -j4
 
       - name: Collect artifacts
