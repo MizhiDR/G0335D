@@ -81,14 +81,35 @@ jobs:
             git clone --depth=1 https://github.com/MizhiDR/vendor_gree_g0335d.git vendor/gree/g0335d
           fi
 
+      - name: Sync device dependencies
+        run: |
+          cd "$GITHUB_WORKSPACE/lineage"
+          # device/qcom/common is normally in the LineageOS manifest, but make
+          # sure it exists because the device tree includes its sepolicy/display
+          # helpers.
+          if [ ! -d device/qcom/common ]; then
+            git clone --depth=1 -b cm-14.1 \
+              https://github.com/LineageOS/android_device_qcom_common.git \
+              device/qcom/common || true
+          fi
+          # NXP NFC projects listed in cm.dependencies (not in every manifest).
+          for spec in \
+            "vendor/nxp-nfc/opensource/frameworks:android_vendor_nxp-nfc_opensource_frameworks" \
+            "vendor/nxp-nfc/opensource/libnfc-nci:android_vendor_nxp-nfc_opensource_libnfc-nci" \
+            "vendor/nxp-nfc/opensource/Nfc:android_vendor_nxp-nfc_opensource_Nfc"; do
+            path="${spec%%:*}"
+            repo="${spec##*:}"
+            if [ ! -d "$path" ]; then
+              git clone --depth=1 -b cm-14.1 \
+                "https://github.com/LineageOS/$repo.git" "$path" || true
+            fi
+          done
+
       - name: Build LineageOS 14.1
         run: |
           cd "$GITHUB_WORKSPACE/lineage"
           source build/envsetup.sh
-          if ! breakfast g0335d; then
-            echo "breakfast failed, falling back to lunch lineage_g0335d-userdebug"
-            lunch lineage_g0335d-userdebug
-          fi
+          lunch lineage_g0335d-userdebug
           export WITH_DEXPREOPT=false
           export LC_ALL=C
           mka bacon -j4

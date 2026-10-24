@@ -1,10 +1,6 @@
-# The LineageOS/CM product is only advertised when the CM vendor tree is
-# present. TWRP's minimal manifest does not ship vendor/cm, so it only sees
-# the omni_g0335d product.
-PRODUCT_MAKEFILES :=
-
-ifneq ($(wildcard vendor/cm/config/common_full_phone.mk),)
-PRODUCT_MAKEFILES += $(LOCAL_DIR)/lineage_g0335d.mk
-endif
-
-PRODUCT_MAKEFILES += $(LOCAL_DIR)/omni_g0335d.mk
+# Always advertise both products. The LineageOS product inherits vendor/cm
+# conditionally, so the same tree can still be used with TWRP's minimal
+# manifest (where vendor/cm is absent).
+PRODUCT_MAKEFILES := \
+    $(LOCAL_DIR)/lineage_g0335d.mk \
+    $(LOCAL_DIR)/omni_g0335d.mk
