@@ -35,6 +35,24 @@ jobs:
           distribution: temurin
           java-version: '8'
 
+      - name: Configure Jack
+        run: |
+          # cm-14.1 uses Jack 4.8.ALPHA, which talks to its server over
+          # TLSv1.  JDK 8u292+ disables TLSv1/TLSv1.1 by default, which
+          # makes every jack-admin connection fail with "SSL error".
+          JAVA_SEC="$JAVA_HOME/jre/lib/security/java.security"
+          if [ -f "$JAVA_SEC" ]; then
+            if ! sed -i 's/^jdk\.tls\.disabledAlgorithms=.*/jdk.tls.disabledAlgorithms=SSLv3, RC4, DES, MD5withRSA, DH keySize < 1024, EC keySize < 224, 3DES_EDE_CBC, anon, NULL/' "$JAVA_SEC" 2>/dev/null; then
+              sudo sed -i 's/^jdk\.tls\.disabledAlgorithms=.*/jdk.tls.disabledAlgorithms=SSLv3, RC4, DES, MD5withRSA, DH keySize < 1024, EC keySize < 224, 3DES_EDE_CBC, anon, NULL/' "$JAVA_SEC"
+            fi
+            grep '^jdk.tls.disabledAlgorithms' "$JAVA_SEC"
+          else
+            echo "java.security not found at $JAVA_SEC"
+          fi
+          # The runner starts with a clean HOME, but be explicit.
+          rm -rf "$HOME/.jack-server" "$HOME/.jack-settings"
+          java -version
+
       - name: Install build dependencies
         run: |
           sudo apt-get update
@@ -157,4 +175,5 @@ jobs:
           path: |
             lineage/out/verbose.log.gz
             lineage/out/error.log
+            /home/runner/.jack-server/logs/
           if-no-files-found: ignore
