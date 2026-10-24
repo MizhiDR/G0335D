@@ -123,15 +123,8 @@ jobs:
                 "https://github.com/LineageOS/$repo.git" "$path" || true
             fi
           done
-          # LineageOS' NXP NFC tree does not compile for PN547C2 without an
-          # eSE-capable configuration: NativeSecureElement.cpp uses
-          # EE_ERROR_EXT_FIELD, which is only defined in the legacy
-          # nxp/jni/com_android_nfc.h.  Add the constant next to its sibling.
-          NFC_FILE="vendor/nxp-nfc/opensource/Nfc/nci/jni/NativeSecureElement.cpp"
-          if ! grep -q 'static const int EE_ERROR_EXT_FIELD' "$NFC_FILE"; then
-            sed -i '/static const int EE_ERROR_LISTEN_MODE = -4;/a static const int EE_ERROR_EXT_FIELD = -5;' "$NFC_FILE"
-          fi
-          grep -n 'EE_ERROR_EXT_FIELD' "$NFC_FILE"
+          # Patch the NXP NFC tree for PN547C2 (see the script for details).
+          python2 device/gree/g0335d/patches/fix_nxp_pn547.py
 
       - name: Build LineageOS 14.1
         run: |
@@ -156,6 +149,9 @@ jobs:
           done
           export WITH_DEXPREOPT=false
           export LC_ALL=C
+          # Compile the NXP NFC JNI early: it is the most device-specific
+          # component and the quickest place to catch PN547C2 issues.
+          mka libnqnfc_nci_jni -j4
           # cm-14.1's CMSDK makefile has a missing dependency: the
           # org.cyanogenmod.platform.internal javac step runs before
           # org.cyanogenmod.platform-res has generated R.java/Manifest.java.
