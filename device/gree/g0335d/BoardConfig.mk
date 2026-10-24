@@ -200,6 +200,9 @@ BOARD_SEPOLICY_DIRS += $(DEVICE_PATH)/sepolicy
 # Sensors
 USE_SENSOR_MULTI_HAL := true
 
+# FM
+BOARD_HAVE_QCOM_FM := true
+
 # Timeservice
 BOARD_USES_QC_TIME_SERVICES := true
 
