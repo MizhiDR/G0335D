@@ -121,6 +121,12 @@ jobs:
           rm -rf "$OUT/obj/KERNEL_OBJ/usr"
           mkdir -p "$OUT/obj/KERNEL_OBJ"
           cp -r device/gree/g0335d/kernel-headers "$OUT/obj/KERNEL_OBJ/usr"
+          # frameworks/base only pre-creates the 64-bit export_includes for
+          # libtime_genoff; do the 32-bit one as well.
+          for arch_dir in "$OUT/obj" "$OUT/obj_arm"; do
+            mkdir -p "$arch_dir/SHARED_LIBRARIES/libtime_genoff_intermediates"
+            touch "$arch_dir/SHARED_LIBRARIES/libtime_genoff_intermediates/export_includes"
+          done
           export WITH_DEXPREOPT=false
           export LC_ALL=C
           mka bacon -j4
