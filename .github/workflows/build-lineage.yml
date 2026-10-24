@@ -76,6 +76,9 @@ jobs:
           if [ -d "$GITHUB_WORKSPACE/vendor/gree/g0335d/proprietary" ]; then
             mkdir -p vendor/gree
             cp -r "$GITHUB_WORKSPACE/vendor/gree/g0335d" vendor/gree/
+          else
+            mkdir -p vendor/gree
+            git clone --depth=1 https://github.com/MizhiDR/vendor_gree_g0335d.git vendor/gree/g0335d
           fi
 
       - name: Build LineageOS 14.1

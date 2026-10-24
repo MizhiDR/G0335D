@@ -113,7 +113,17 @@ TWRP 关键配置：
 
 ## vendor blobs
 
-默认不包含 vendor blobs（手机 `/system/vendor` 实测约 524 MB）。手机已连接时：
+完整 vendor blobs 已放在：
+
+- https://github.com/MizhiDR/vendor_gree_g0335d （约 568 MB，2,689 个文件）
+
+CI workflow 会自动 clone 这个仓库。手动构建时：
+
+```bash
+git clone https://github.com/MizhiDR/vendor_gree_g0335d vendor/gree/g0335d
+```
+
+也可以从手机或 `C:\AndroidCarrierClassTools\gree_g3s\system_dump` 重新生成：
 
 ```bash
 cd device/gree/g0335d
