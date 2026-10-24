@@ -21,7 +21,9 @@
 -->
 <resources>
     <!-- HDR needs 1x frame -->
+    <!-- LineageOS 14.1 Snap no longer defines pref_camera_hdr_need_1x_default.
     <string name="pref_camera_hdr_need_1x_default" translatable="false">false</string>
+    -->
     <string name="pref_camera_auto_hdr_default" translatable="false">enable</string>
     <string name="pref_camera_scenedetect_default" translatable="false">on</string>
     <string name="pref_camera_dis_default" translatable="false">enable</string>
