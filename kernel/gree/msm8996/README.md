@@ -38,3 +38,14 @@ make ARCH=arm64 -j$(nproc)
 ```
 
 The prebuilt kernel is sufficient for LineageOS 14.1 and TWRP builds.
+
+## Reverse-engineered extras
+
+- `Image` — uncompressed 3.18.31 kernel (`E7F13B44ADC317C02866D9FD3A0DD6E7`)
+- `dtb_all.bin` — 124 concatenated DTBs from the stock boot image
+- `g0335d.dtb` / `g0335d.dts` — the exact G3S board DTB/DTS selected by
+  `msm-id=0x131/0x10001`, `board-id=0x8/0`, `pmic-id=0x20009/0x10013`
+- `reference/` — Mi 5 (gemini) defconfig and DTS files used as baseline
+- `REVERSE_ENGINEERING.md` — extraction method and kernel source bring-up notes
+
+Kernel source baseline: `LineageOS/android_kernel_xiaomi_msm8996` (cm-14.1).
