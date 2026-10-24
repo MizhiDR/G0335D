@@ -114,6 +114,13 @@ jobs:
           # Work around an old kati/find issue: some CM14.1 makefiles run
           # "find" on this intermediates dir before it is created.
           mkdir -p out/target/common/obj/SHARED_LIBRARIES/libwifi-hal-mock_intermediates
+          # This device ships a prebuilt stock kernel, so the usual
+          # KERNEL_OBJ/usr headers_install step does not exist.  Platform
+          # modules such as libsdcard depend on it and include <linux/fuse.h>.
+          test -n "$OUT"
+          rm -rf "$OUT/obj/KERNEL_OBJ/usr"
+          mkdir -p "$OUT/obj/KERNEL_OBJ"
+          cp -r device/gree/g0335d/kernel-headers "$OUT/obj/KERNEL_OBJ/usr"
           export WITH_DEXPREOPT=false
           export LC_ALL=C
           mka bacon -j4
